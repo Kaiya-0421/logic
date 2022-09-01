@@ -14,6 +14,7 @@ void printTime(struct timespec start,struct timespec end, char str[]);
 void printTime1(struct timespec start,struct timespec end, char str[]);
 
 int main(int argc, char *argv[]){
+
     int i;
     int acc;
     struct timespec start,end,t1,t2,t3;
@@ -32,41 +33,62 @@ int main(int argc, char *argv[]){
 
     gmpfi_t a,tmp,one;
     gmpfi_t x[size];
-    gmpfi_init2 (a, acc);
-    gmpfi_set_str (a ,"4" ,10);
-    gmpfi_init2 (one, acc);
-    gmpfi_set_str (one ,"1" ,10);
-    gmpfi_init2 (tmp, acc);
-    gmpfi_init2 (x[0], acc);
-    gmpfi_set_str (x[0] ,"0.7501" ,10);
+    mpfr_t relerr;///値
+
+    gmpfi_init2 (a, acc);//4
+    gmpfi_set_str (a ,"4" ,10);//4
+    gmpfi_init2 (one, acc);//1
+    gmpfi_set_str (one ,"1" ,10);//1
+    gmpfi_init2 (tmp, acc);//ビット数
+    gmpfi_init2 (x[0], acc);//ビット数
+    gmpfi_set_str (x[0] ,"0.7501" ,10);//初期値
     for(i=1;i<size;i++){
         gmpfi_init2 (x[i], acc);
     }
     clock_gettime(CLOCK_REALTIME, &t1); 
     ///ロジスティック写像の計算の反復
+
+
+
     for(i=1;i<size;i++){
         gmpfi_sub(tmp_mpfi,one,x[i-1]);
         gmpfi_mul(tmp_mpfi,x[i-1],tmp_mpfi);
         gmpfi_mul(x[i],a,tmp_mpfi);
     }
     clock_gettime(CLOCK_REALTIME, &t2); 
+//ロジスティック写像の初項
+  //  mpfi_out_str(stdout , 10, 0, x[0]->mpfi);
+  // putchar('\n');
+
 
     cmpfi_cal();  //スレッド破棄の関数
-    #ifdef TEST_OUT
+///　　ロジスティック写像の表示
+    //#ifdef TEST_OUT
     putchar ('\n');
     for(i = 0; i < size; i++){
+      
         mpfi_out_str (stdout , 10, 0, x[i]->mpfi);
+        mpfi_out_str(stdout, 10, 17, x[i]->mpfi);
         putchar ('\n');
     }
     // mpfi_out_str (stdout , 10, 0, x[0]->mpfi);
     // putchar ('\n');
     // mpfi_out_str (stdout , 10, 0, x[size-1]->mpfi);
     // putchar ('\n');
-    #endif
+
+    //#endif
+
+
+
+
+
+
+
     clock_gettime(CLOCK_REALTIME, &t3); 
     gmpfi_clear(tmp);
     gmpfi_clear(one);
     gmpfi_clear(a);
+    mpfr_clear(relerr);
     for(i = 0;i < size; i++){
         gmpfi_clear(x[i]);
     }
